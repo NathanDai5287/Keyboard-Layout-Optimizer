@@ -3,10 +3,10 @@ from keyboard import Layout
 import nltk
 from concurrent.futures import ThreadPoolExecutor
 
-POPULATION_SIZE = 500
-GENERATIONS = 100
+POPULATION_SIZE = 20
+GENERATIONS = 2000
 MUTATION_RATE = 0.2
-CORPUS = ''.join(nltk.corpus.brown.words())[:10000]
+CORPUS = ''.join(nltk.corpus.brown.words())[:500]
 KEEP_RATE = 0.5
 
 population = [Layout() for _ in range(POPULATION_SIZE)]
@@ -31,4 +31,4 @@ for generation in range(GENERATIONS):
 
 	population = new_population
 
-print(population[0])
+population[0].visualize()
