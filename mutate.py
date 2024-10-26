@@ -6,17 +6,29 @@ from concurrent.futures import ThreadPoolExecutor
 POPULATION_SIZE = 20
 GENERATIONS = 2000
 MUTATION_RATE = 0.2
-CORPUS = ''.join(nltk.corpus.brown.words())[:500]
+# CORPUS = ''.join(nltk.corpus.brown.words())[:1000]
+CORPUS = open('corpus/output.txt', 'r', encoding='utf-8').read()[:100000]
 KEEP_RATE = 0.5
 
 population = [Layout() for _ in range(POPULATION_SIZE)]
 
-for generation in range(GENERATIONS):
+# for generation in range(GENERATIONS):
+static = 0
+previous_fitness = float('-inf')
+generation = 0
+while (static < 200):
 	# [layout.set_fitness(CORPUS) for layout in population]
 	with ThreadPoolExecutor(max_workers=POPULATION_SIZE) as executor:
 		executor.map(lambda layout: layout.set_fitness(CORPUS), population)
 
 	population.sort(key=lambda layout: layout.fitness, reverse=True)
+	best = population[0].fitness
+
+	if (best == previous_fitness):
+		static += 1
+	else:
+		static = 0
+	previous_fitness = best
 
 	print(f'Generation {generation}: {population[0].fitness}')
 
@@ -31,4 +43,7 @@ for generation in range(GENERATIONS):
 
 	population = new_population
 
+	generation += 1
+
 population[0].visualize()
+population[0].dump('keyboards/keyboard.pkl')

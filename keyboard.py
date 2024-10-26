@@ -2,12 +2,51 @@ from visualize import LayoutVisualizer
 from string import ascii_lowercase, ascii_uppercase, digits, punctuation
 import numpy as np
 import random
-import math
+import pickle
+from enum import Enum
 
 import random
 from string import ascii_lowercase, ascii_uppercase, digits, punctuation
 
 case_map = dict(zip(ascii_lowercase, ascii_uppercase))
+
+class Hand(Enum):
+	LEFT = 0
+	RIGHT = 1
+
+class Finger(Enum):
+  INDEX_LEFT = 1
+  MIDDLE_LEFT = 2
+  RING_LEFT = 3
+  PINKY_LEFT = 4
+  INDEX_RIGHT = 5
+  MIDDLE_RIGHT = 6
+  RING_RIGHT = 7
+  PINKY_RIGHT = 8
+
+finger_map = {
+	Finger.PINKY_LEFT: [0, 1, 2, 3, 26, 27, 52, 53, 74, 75],
+	Finger.RING_LEFT: [4, 5, 28, 29, 54, 55, 76, 77],
+	Finger.MIDDLE_LEFT: [6, 7, 30, 31, 56, 57],
+	Finger.INDEX_LEFT: [8, 9, 10, 11, 32, 33, 34, 35, 58, 59, 60, 61, 78, 79, 80, 81, 82, 83],
+	Finger.INDEX_RIGHT: [12, 13, 14, 15, 36, 37, 38, 39, 62, 63, 64, 65, 84, 85, 86, 87],
+	Finger.MIDDLE_RIGHT: [16, 17, 40, 41, 66, 67, 88, 89],
+	Finger.RING_RIGHT: [18, 19, 42, 43, 44, 45, 68, 69, 90, 91],
+	Finger.PINKY_RIGHT: [20, 21, 22, 23, 24, 25, 46, 47, 48, 49, 50, 51, 70, 71, 72, 73, 92, 93]
+}
+
+finger_map = {key: [k for k, v in finger_map.items() if key in v][0] for key in range(94)}
+
+hand_map = {
+	Finger.PINKY_LEFT: Hand.LEFT,
+	Finger.RING_LEFT: Hand.LEFT,
+	Finger.MIDDLE_LEFT: Hand.LEFT,
+	Finger.INDEX_LEFT: Hand.LEFT,
+	Finger.INDEX_RIGHT: Hand.RIGHT,
+	Finger.MIDDLE_RIGHT: Hand.RIGHT,
+	Finger.RING_RIGHT: Hand.RIGHT,
+	Finger.PINKY_RIGHT: Hand.RIGHT
+}
 
 class Key:
 	def __init__(self, base, shift):
@@ -57,6 +96,17 @@ class Layout:
 	def validate(self):
 		assert len(self.keys) == 47
 		assert len(set(self.keys)) == len(self.keys)
+
+	def translate(self, text: str, layout) -> str:
+		translation = []
+		for char in text:
+			try:
+				idx = self.expanded.index(char)
+				translation.append(layout.expanded[idx])
+			except ValueError:
+				translation.append(char)
+
+		return ''.join(translation)
 
 	@staticmethod
 	def crossover(a, b):
@@ -182,12 +232,17 @@ class Layout:
 
 	def set_fitness(self, corpus):
 		self.fitness = 0
-		for char in corpus:
+		# get the finger used to type the first letter of the corpus
+		previous_finger = finger_map[self.expanded.index(corpus[0])]
+		previous_hand = hand_map[previous_finger]
+		for char in corpus[1:]:
 			position = self.expanded.index(char)
+			finger = finger_map[position]
+			hand = hand_map[finger]
 
 			# reaching for the +2 row is really bad
 			if (position <= 25):
-				self.fitness -= 2
+				self.fitness -= 40
 
 			# reaching for the +-1 row is bad
 			elif (26 <= position <= 51):
@@ -196,18 +251,32 @@ class Layout:
 			elif (74 <= position):
 				self.fitness -= 1
 
-			# pinky stretching is bad
+			# pinky stretching is really bad
 			if (position in {0, 1, 2, 3, 22, 23, 24, 25, 48, 40, 50, 51}):
-				self.fitness -= 1
+				self.fitness -= 60
 
 			# using the same finger twice is bad
+			if (finger == previous_finger):
+				self.fitness -= 10
+			previous_finger = finger
+
 			# alternating hands is good
+			if (hand != previous_hand):
+				self.fitness += 0.5
+
+			# using shift is bad
+			if (position % 2 == 1):
+				self.fitness -= 5
 
 		self.fitness /= len(corpus) / 100
 
 	def visualize(self):
 		visualizer = LayoutVisualizer(self, 'template.png')
 		visualizer.visualize()
+
+	def dump(self, path):
+		with open(path, 'wb') as f:
+			pickle.dump(self, f)
 
 colemak = Layout("""`~1!2@3#4$5%6^7&8*9(0)-_=+qwfpgjluy;:[{]}\|arstdhneio'"zxcvbkm,<.>/?""")
 qwerty = Layout("""`~1!2@3#4$5%6^7&8*9(0)-_=+qwertyuiop[{]}\|asdfghjkl;:'"zxcvbnm,<.>/?""")

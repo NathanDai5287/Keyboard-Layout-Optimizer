@@ -1,4 +1,3 @@
-import pathlib
 from PIL import Image, ImageDraw, ImageFont
 
 class LayoutVisualizer:
