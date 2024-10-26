@@ -1,0 +1,20 @@
+Sat Oct 26 01:28:39 2024    output.prof
+
+         187679145 function calls (180715437 primitive calls) in 58.466 seconds
+
+   Ordered by: cumulative time
+   List reduced from 505 to 10 due to restriction <10>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+     2092    0.008    0.000  101.035    0.048 C:\Users\natha\AppData\Local\Programs\Python\Python312\Lib\threading.py:1115(join)
+27453/18828    0.470    0.000  100.512    0.005 {method 'acquire' of '_thread.lock' objects}
+     2092    0.045    0.000  100.079    0.048 C:\Users\natha\AppData\Local\Programs\Python\Python312\Lib\threading.py:1153(_wait_for_tstate_lock)
+     17/1    0.000    0.000   58.466   58.466 {built-in method builtins.exec}
+        1    0.021    0.021   58.466   58.466 c:\Users\natha\Programming\Keyboard Layout\mutate.py:8(main)
+      307    0.001    0.000   57.653    0.188 C:\Users\natha\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\_base.py:646(__exit__)
+      307    0.002    0.000   57.653    0.188 C:\Users\natha\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\thread.py:219(shutdown)
+ 2092/307    0.044    0.000   57.604    0.188 C:\Users\natha\AppData\Local\Programs\Python\Python312\Lib\threading.py:1016(_bootstrap)
+ 2092/307    0.079    0.000   55.333    0.180 C:\Users\natha\AppData\Local\Programs\Python\Python312\Lib\threading.py:1056(_bootstrap_inner)
+6140/3436    0.215    0.000   51.505    0.015 C:\Users\natha\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\thread.py:53(run)
+
+

@@ -1,6 +1,6 @@
 from visualize import LayoutVisualizer
 from string import ascii_lowercase, ascii_uppercase, digits, punctuation
-import numpy as np
+import math
 import random
 import pickle
 from enum import Enum
@@ -235,7 +235,7 @@ class Layout:
 		# get the finger used to type the first letter of the corpus
 		previous_finger = finger_map[self.expanded.index(corpus[0])]
 		previous_hand = hand_map[previous_finger]
-		for char in corpus[1:]:
+		for i, char in enumerate(corpus[1:]):
 			position = self.expanded.index(char)
 			finger = finger_map[position]
 			hand = hand_map[finger]
@@ -253,22 +253,22 @@ class Layout:
 
 			# pinky stretching is really bad
 			if (position in {0, 1, 2, 3, 22, 23, 24, 25, 48, 40, 50, 51}):
-				self.fitness -= 60
+				self.fitness -= 100
 
 			# using the same finger twice is bad
 			if (finger == previous_finger):
-				self.fitness -= 10
+				self.fitness -= 40
 			previous_finger = finger
 
 			# alternating hands is good
 			if (hand != previous_hand):
-				self.fitness += 0.5
+				self.fitness += 1
 
 			# using shift is bad
 			if (position % 2 == 1):
-				self.fitness -= 5
+				self.fitness -= 20
 
-		self.fitness /= len(corpus) / 100
+		self.fitness = -math.log(-self.fitness)
 
 	def visualize(self):
 		visualizer = LayoutVisualizer(self, 'template.png')
