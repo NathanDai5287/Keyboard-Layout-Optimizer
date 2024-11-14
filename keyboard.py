@@ -235,7 +235,7 @@ class Layout:
 		# get the finger used to type the first letter of the corpus
 		previous_finger = finger_map[self.expanded.index(corpus[0])]
 		previous_hand = hand_map[previous_finger]
-		for i, char in enumerate(corpus[1:]):
+		for char in corpus[1:]:
 			position = self.expanded.index(char)
 			finger = finger_map[position]
 			hand = hand_map[finger]
@@ -265,7 +265,7 @@ class Layout:
 				self.fitness += 1
 
 			# using shift is bad
-			if (position % 2 == 1):
+			if (position % 2 == 1 and not char.isalnum()):
 				self.fitness -= 20
 
 		self.fitness = -math.log(-self.fitness)
