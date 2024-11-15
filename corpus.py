@@ -1,3 +1,5 @@
+# TODO: remove api keys and long sections of text in quotes
+
 import random
 import os
 
